@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>방탈출: 암호학자의 서재</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #2c1810, #4a2c1a);
+            color: #f4e4c1;
+            min-height: 100vh;
+            overflow-x: auto;
+        }
+
+        .room {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            border: 2px solid #8b6914;
+        }
+
+        .header h1 {
+            color: #ffd700;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .story {
+            font-style: italic;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .puzzle-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .puzzle-box {
+            background: rgba(139, 105, 20, 0.2);
+            border: 2px solid #8b6914;
+            border-radius: 10px;
+            padding: 25px;
+            backdrop-filter: blur(5px);
+        }
+
+        .puzzle-title {
+            color: #ffd700;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 1px solid #8b6914;
+            padding-bottom: 10px;
+        }
+
+        .bookshelf {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .book {
+            background: linear-gradient(135deg, #654321, #8b4513);
+            padding: 15px 8px;
+            text-align: center;
+            border-radius: 5px;
+            border: 1px solid #a0522d;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+
+        .book:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255,215,0,0.3);
+        }
+
+        .clock {
+            width: 150px;
+            height: 150px;
+            border: 8px solid #8b6914;
+            border-radius: 50%;
+            margin: 20px auto;
+            position: relative;
+            background: radial-gradient(circle, #2c1810, #4a2c1a);
+        }
+
+        .clock-face {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border-radius: 50%;
+            background: #1a1a1a;
+        }
+
+        .clock-number {
+            position: absolute;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .clock-hand {
+            position: absolute;
+            background: #ffd700;
+            transform-origin: bottom center;
+            border-radius: 2px;
+            z-index: 10;
+        }
+
+        .hour-hand {
+            width: 4px;
+            height: 30px;
+            top: 45px;
+            left: 50%;
+            margin-left: -2px;
+            box-shadow: 0 0 3px rgba(255, 215, 0, 0.8);
+        }
+
+        .minute-hand {
+            width: 2px;
+            height: 45px;
+            top: 30px;
+            left: 50%;
+            margin-left: -1px;
+            box-shadow: 0 0 3px rgba(255, 215, 0, 0.8);
+        }
+
+        .clock-center {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #ffd700;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            margin: -3px 0 0 -3px;
+            z-index: 15;
+        }
+
+        .safe {
+            background: #333;
+            border: 4px solid #666;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px auto;
+            width: 250px;
+        }
+
+        .safe-display {
+            background: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .safe-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .safe-key {
+            background: #555;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .safe-key:hover {
+            background: #777;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0,0,0,0.5);
+            border: 2px solid #8b6914;
+            border-radius: 5px;
+            color: #f4e4c1;
+            font-size: 16px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #8b6914, #ffd700);
+            color: #2c1810;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,215,0,0.3);
+        }
+
+        .hint-btn {
+            background: linear-gradient(135deg, #4a2c1a, #8b4513);
+            color: #f4e4c1;
+            font-size: 14px;
+            padding: 8px 15px;
+        }
+
+        .hint {
+            background: rgba(0,0,0,0.7);
+            border-left: 4px solid #ffd700;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .success {
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+        }
+
+        .error {
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid #ff0000;
+            color: #ff4444;
+        }
+
+        .final-puzzle {
+            grid-column: 1 / -1;
+            text-align: center;
+            background: rgba(255, 215, 0, 0.1);
+            border: 3px solid #ffd700;
+        }
+
+        .symbol-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+            max-width: 300px;
+            margin: 20px auto;
+        }
+
+        .symbol {
+            background: #2c1810;
+            border: 2px solid #8b6914;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .symbol:hover {
+            background: #8b6914;
+        }
+
+        .symbol.selected {
+            background: #ffd700;
+            color: #2c1810;
+        }
+
+        @media (max-width: 768px) {
+            .puzzle-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .bookshelf {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="room">
+        <div class="header">
+            <h1>🔐 암호학자의 서재 🔐</h1>
+            <div class="story">
+                당신은 유명한 암호학자의 서재에 갇혔습니다. 그는 세상을 떠나기 전, 
+                자신의 가장 소중한 비밀을 담은 금고를 남겼습니다. 
+                서재 곳곳에 숨겨진 단서들을 해독하여 최종 암호를 찾아내세요!
+            </div>
+        </div>
+
+        <div class="puzzle-container">
+            <!-- 퍼즐 1: 책장의 비밀 -->
+            <div class="puzzle-box">
+                <div class="puzzle-title">📚 현자의 서가</div>
+                <p>책장에는 12권의 책이 있습니다. 특별한 순서로 배열된 책들이 첫 번째 단서를 제공합니다.</p>
+                
+                <div class="bookshelf">
+                    <div class="book">수학의 아름다움<br>페이지: 271</div>
+                    <div class="book">철학 입문<br>페이지: 180</div>
+                    <div class="book">물리학 원리<br>페이지: 314</div>
+                    <div class="book">화학 반응<br>페이지: 220</div>
+                    <div class="book">생물학 탐구<br>페이지: 198</div>
+                    <div class="book">지구과학<br>페이지: 267</div>
+                    <div class="book">문학의 세계<br>페이지: 156</div>
+                    <div class="book">역사 탐방<br>페이지: 203</div>
+                    <div class="book">예술 감상<br>페이지: 142</div>
+                    <div class="book">음악 이론<br>페이지: 189</div>
+                    <div class="book">언어학 개론<br>페이지: 238</div>
+                    <div class="book">심리학 연구<br>페이지: 175</div>
+                </div>
+
+                <div class="input-group">
+                    <label>책장에서 발견한 첫 번째 숫자 (3자리):</label>
+                    <input type="text" id="bookshelf-answer" placeholder="숫자 입력">
+                </div>
+                <button class="btn" onclick="checkBookshelf()">확인</button>
+                <button class="hint-btn" onclick="toggleHint('hint1')">힌트</button>
+                
+                <div id="hint1" class="hint">
+                    💡 소수인 페이지를 골라보면...
+                </div>
+                <div id="feedback1" class="feedback" style="display:none;"></div>
+            </div>
+
+            <!-- 퍼즐 2: 숫자 패턴 퍼즐 -->
+            <div class="puzzle-box">
+                <div class="puzzle-title">🔢 수열의 비밀</div>
+                <p>서재 바닥에서 발견한 신비한 숫자 패턴입니다.</p>
+                
+                <div style="background: rgba(0,0,0,0.5); padding: 30px; border-radius: 10px; text-align: center; margin: 20px 0;">
+                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; max-width: 400px; margin: 0 auto;">
+                        <div style="background: #8b6914; padding: 20px; border-radius: 8px; font-size: 24px; font-weight: bold;">2</div>
+                        <div style="background: #8b6914; padding: 20px; border-radius: 8px; font-size: 24px; font-weight: bold;">3</div>
+                        <div style="background: #8b6914; padding: 20px; border-radius: 8px; font-size: 24px; font-weight: bold;">5</div>
+                        <div style="background: #8b6914; padding: 20px; border-radius: 8px; font-size: 24px; font-weight: bold;">7</div>
+                        <div style="background: #ffd700; padding: 20px; border-radius: 8px; font-size: 24px; font-weight: bold; color: #2c1810;">?</div>
+                    </div>
+                    
+                    <div style="margin: 30px 0;">
+                        <div style="background: #2c1810; padding: 15px; border-radius: 5px; border-left: 4px solid #ffd700;">
+                            <strong>암호학자의 메모:</strong><br>
+                            "가장 순수한 숫자들의 행진이 계속된다"<br>
+                            "다음 두 개의 수를 찾아 더하면 답이 나온다"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>패턴을 완성하는 두 개째 숫자:</label>
+                    <input type="text" id="pattern-answer" placeholder="숫자 입력">
+                </div>
+                <button class="btn" onclick="checkPattern()">확인</button>
+                <button class="hint-btn" onclick="toggleHint('hint2')">힌트</button>
+                
+                <div id="hint2" class="hint">
+                    💡 이 숫자들은 모두 소수(Prime Number)입니다!<br>
+                    다음에 나올 두 소수의 합은?
+                </div>
+                <div id="feedback2" class="feedback" style="display:none;"></div>
+            </div>
+
+            <!-- 퍼즐 3: 암호화된 메시지 -->
+            <div class="puzzle-box">
+                <div class="puzzle-title">🔤 암호문 해독</div>
+                <p>벽에 걸린 그림 뒤에서 발견한 암호화된 메시지입니다.</p>
+                
+                <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; font-family: 'Courier New', monospace; margin: 20px 0;">
+                    <div style="color: #ff6b6b; font-size: 18px; text-align: center;">
+                        WKLV LV WKH WKLUG FOXH<br>
+                        WKH DQVZHU LV WKLUWB VLA
+                    </div>
+                </div>
+
+                <p style="font-style: italic; text-align: center;">
+                    "모든 문자는 3의 춤을 춘다" - 암호학자의 노트
+                </p>
+
+                <div class="input-group">
+                    <label>해독된 메시지에서 세 번째 숫자 (2자리):</label>
+                    <input type="text" id="cipher-answer" placeholder="숫자 입력">
+                </div>
+                <button class="btn" onclick="checkCipher()">확인</button>
+                <button class="hint-btn" onclick="toggleHint('hint3')">힌트</button>
+                
+                <div id="hint3" class="hint">
+                    💡 "3의 춤"이라는 시저 암호(Caesar Cipher)입니다.
+                    각 문자를 알파벳에서 3칸 뒤로 밀어서 해독해보세요.
+                    예: W → T, K → H, L → I...
+                </div>
+                <div id="feedback3" class="feedback" style="display:none;"></div>
+            </div>
+
+            <!-- 퍼즐 4: 수학 퍼즐 -->
+            <div class="puzzle-box">
+                <div class="puzzle-title">🔢 논리의 미로</div>
+                <p>서랍에서 발견한 수학 퍼즐입니다.</p>
+                
+                <div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <div style="font-size: 18px; text-align: center; line-height: 2;">
+                        A × B = 20<br>
+                        B × C = 35<br>
+                        A × C = ?
+                    </div>
+                    
+                    <div style="margin-top: 20px; font-size: 16px; text-align: center; color: #ffd700;">
+                        단, A, B, C는 모두 한 자릿수 양의 정수입니다.
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>A × C = ?:</label>
+                    <input type="text" id="math-answer" placeholder="숫자 입력">
+                </div>
+                <button class="btn" onclick="checkMath()">확인</button>
+                <button class="hint-btn" onclick="toggleHint('hint4')">힌트</button>
+                
+                <div id="hint4" class="hint">
+                    💡 없음<br>
+                    따라서 메롱                </div>
+                <div id="feedback4" class="feedback" style="display:none;"></div>
+            </div>
+
+            <!-- 최종 퍼즐 -->
+            <div class="puzzle-box final-puzzle">
+                <div class="puzzle-title">🏆 최종 관문: 마스터 코드</div>
+                <p>네 개의 단서를 모두 찾았다면, 이제 최종 암호를 입력할 차례입니다!</p>
+                
+                <div class="safe">
+                    <div class="safe-display" id="safe-display">- - - - - - - - -</div>
+                    <div class="safe-keypad">
+                        <button class="safe-key" onclick="safeInput('1')">1</button>
+                        <button class="safe-key" onclick="safeInput('2')">2</button>
+                        <button class="safe-key" onclick="safeInput('3')">3</button>
+                        <button class="safe-key" onclick="safeInput('4')">4</button>
+                        <button class="safe-key" onclick="safeInput('5')">5</button>
+                        <button class="safe-key" onclick="safeInput('6')">6</button>
+                        <button class="safe-key" onclick="safeInput('7')">7</button>
+                        <button class="safe-key" onclick="safeInput('8')">8</button>
+                        <button class="safe-key" onclick="safeInput('9')">9</button>
+                    </div>
+                    <button class="safe-key" onclick="safeInput('0')" style="width: 100%;">0</button>
+                    <button class="btn" onclick="clearSafe()" style="margin: 10px 5px;">지우기</button>
+                    <button class="btn" onclick="checkFinalCode()" style="margin: 10px 5px;">확인</button>
+                </div>
+
+                <div style="margin: 20px 0; font-size: 14px; color: #ccc;">
+                    힌트: 소수 수열을 계속하세요 2→3→5→7→?→?
+                </div>
+
+                <button class="hint-btn" onclick="toggleHint('hint5')">힌트</button>
+                <div id="hint5" class="hint">
+                    💡 모든 퍼즐을 차례대로 풀어보세요:<br>
+                    1) 책장에서 소수를 찾으세요<br>
+                    2) 색상 파장의 패턴을 분석하세요<br>
+                    3) 시저 암호를 해독하세요<br>
+                    4) 연립방정식을 풀어보세요<br>
+                    → 네 숫자를 순서대로 연결하면 9자리가 됩니다
+                </div>
+                <div id="final-feedback" class="feedback" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let safeCode = '';
+        const solutions = {
+            bookshelf: '271',  // 소수 페이지들의 첫 번째: 271
+            pattern: '24',     // 다음 두 소수 11+13=24
+            cipher: '36',      // 해독하면 "THIS IS THE THIRD CLUE THE ANSWER IS THIRTY SIX"
+            math: '28'         // A=4, B=5, C=7이므로 A×C=28
+        };
+        
+        let solvedPuzzles = {
+            bookshelf: false,
+            pattern: false,
+            cipher: false,
+            math: false
+        };
+
+        function toggleHint(hintId) {
+            const hint = document.getElementById(hintId);
+            hint.style.display = hint.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function showFeedback(elementId, message, isSuccess) {
+            const feedback = document.getElementById(elementId);
+            feedback.textContent = message;
+            feedback.className = `feedback ${isSuccess ? 'success' : 'error'}`;
+            feedback.style.display = 'block';
+            
+            setTimeout(() => {
+                feedback.style.display = 'none';
+            }, 3000);
+        }
+
+        function checkBookshelf() {
+            const answer = document.getElementById('bookshelf-answer').value;
+            if (answer === solutions.bookshelf) {
+                solvedPuzzles.bookshelf = true;
+                showFeedback('feedback1', '✅ 정확합니다! 소수 271이 첫 번째 단서입니다.', true);
+            } else {
+                showFeedback('feedback1', '❌ 틀렸습니다. 소수인 페이지 수를 다시 확인해보세요.', false);
+            }
+        }
+
+        function checkPattern() {
+            const answer = document.getElementById('pattern-answer').value;
+            if (answer === solutions.pattern) {
+                solvedPuzzles.pattern = true;
+                showFeedback('feedback2', '✅ 정확합니다! 소수 패턴을 발견했습니다.', true);
+            } else {
+                showFeedback('feedback2', '❌ 틀렸습니다. 소수의 패턴을 다시 분석해보세요.', false);
+            }
+        }
+
+        function checkCipher() {
+            const answer = document.getElementById('cipher-answer').value;
+            if (answer === solutions.cipher) {
+                solvedPuzzles.cipher = true;
+                showFeedback('feedback3', '✅ 정확합니다! 36이 세 번째 단서입니다.', true);
+            } else {
+                showFeedback('feedback3', '❌ 틀렸습니다. 시저 암호로 해독한 메시지를 다시 확인해보세요.', false);
+            }
+        }
+
+        function checkMath() {
+            const answer = document.getElementById('math-answer').value;
+            if (answer === solutions.math) {
+                solvedPuzzles.math = true;
+                showFeedback('feedback4', '✅ 정확합니다! 수학 퍼즐을 해결했습니다.', true);
+            } else {
+                showFeedback('feedback4', '❌ 틀렸습니다. 곱셈 조건을 다시 확인해보세요.', false);
+            }
+        }
+
+        function safeInput(num) {
+            if (safeCode.length < 9) {
+                safeCode += num;
+                updateSafeDisplay();
+            }
+        }
+
+        function clearSafe() {
+            safeCode = '';
+            updateSafeDisplay();
+        }
+
+        function updateSafeDisplay() {
+            const display = document.getElementById('safe-display');
+            let displayText = safeCode.padEnd(9, '-').split('').join(' ');
+            display.textContent = displayText;
+        }
+
+        function checkFinalCode() {
+            const correctCode = solutions.bookshelf + solutions.pattern + solutions.cipher + solutions.math;
+            const allSolved = Object.values(solvedPuzzles).every(solved => solved);
+            
+            if (!allSolved) {
+                showFeedback('final-feedback', '⚠️ 모든 퍼즐을 먼저 해결해주세요!', false);
+                return;
+            }
+            
+            if (safeCode === correctCode) {
+                showFeedback('final-feedback', '🎉 축하합니다! 방탈출에 성공했습니다! 암호학자의 비밀을 찾았습니다!', true);
+                
+                // 축하 효과
+                setTimeout(() => {
+                    alert('🏆 완벽한 추리였습니다! 암호학자도 분명 당신의 실력에 감탄했을 것입니다. 🏆');
+                }, 1000);
+            } else {
+                showFeedback('final-feedback', '❌ 암호가 틀렸습니다. 각 퍼즐의 답을 순서대로 연결해보세요.', false);
+            }
+        }
+
+        // 초기화
+        updateSafeDisplay();
+    </script>
+</body>
+</html>
